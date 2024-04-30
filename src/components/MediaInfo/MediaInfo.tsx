@@ -43,7 +43,7 @@ const AdBanner = dynamic(() => import('@components/AdBanner'), { ssr: false });
 
 const { publicRuntimeConfig: { MANGA_IMAGE_POSTER_DOMAIN } } = getNextEnv();
 
-const ITEM_SIZE = 48;
+const ITEM_SIZE = 58;
 
 type MediaInfoProps = {
   fullUrl: string;
@@ -75,8 +75,15 @@ const MediaInfo: FC<MediaInfoProps> = ({
   const imagePoster = useCheckWebpSupport(image);
   const { asPath } = useRouter();
   const chaptersListIsReady = chapters && chapters.list;
-  const imageHeaderBanner = (!bannerImageHightQuality
+
+  const isBannerNotAvailable = !bannerImageHightQuality;
+
+  const imageHeaderBanner = (isBannerNotAvailable
     ? imagePoster
+    : bannerImageHightQuality);
+
+  const mangaImageHeaderBanner = (isBannerNotAvailable
+    ? changeDomainZone(imagePoster, MANGA_IMAGE_POSTER_DOMAIN)
     : bannerImageHightQuality);
 
   const isAnime = type === ECollection.anime;
@@ -85,7 +92,7 @@ const MediaInfo: FC<MediaInfoProps> = ({
     <>
       <div className={classes.bannerWrapper}>
         <ImageWithPlaceholder
-          src={isAnime ? imageHeaderBanner : changeDomainZone(imageHeaderBanner, MANGA_IMAGE_POSTER_DOMAIN)}
+          src={isAnime ? imageHeaderBanner : mangaImageHeaderBanner}
           alt={title.ru}
           className={classes.bannerImage}
           placeholderImage={BANNER_LIGHT}
@@ -99,7 +106,7 @@ const MediaInfo: FC<MediaInfoProps> = ({
       <section
         className={classes.detailContent}
         itemScope
-        itemType={`${type === ECollection.anime ? 'http://schema.org/Movie' : 'http://schema.org/CreativeWork'}`}
+        itemType={`${isAnime ? 'http://schema.org/Movie' : 'http://schema.org/CreativeWork'}`}
       >
         <div className={classes.mediaWrapper}>
           <div
@@ -187,7 +194,7 @@ const MediaInfo: FC<MediaInfoProps> = ({
 
         {torrent && torrent.list.length > 0 && <Torrent list={torrent.list} />}
 
-        {chaptersListIsReady && <Chapters chapters={chapters.list} itemSize={ITEM_SIZE} title={CHAPTER_TITLE} border />}
+        {chaptersListIsReady && <Chapters chapters={chapters.list} itemSize={ITEM_SIZE} title={CHAPTER_TITLE} />}
       </section>
     </>
   );
