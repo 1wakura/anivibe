@@ -10,8 +10,7 @@ import { ELinkPath, ELocale } from '@enums/enums';
 import Link from '@ui/Link';
 
 import chapterIsActive from '@utils/chapterIsActive';
-import getDateFromUnix from '@utils/date/getDateFromUnix';
-import getFormatedDate from '@utils/date/getFormatedDate';
+import FormatedDate from '@utils/date/formatedDate';
 import formatChapterTitle from '@utils/formatting/formatChapterTitle';
 
 import useChaptersStyles from './ChapterRow.styles';
@@ -51,13 +50,16 @@ const ChapterRow: FC<ChapterRowProps<ListChildComponentProps<MangaChapterList[]>
     >
       <span className={classes.chapterTitle}>
         {
+          FormatedDate.isToday(date) && <div className={classes.isToday}/>
+        }
+        {
           formatChapterTitle(vol, ch, title)
         }
       </span>
 
       {
         !hideDate && <span className={classes.date}>
-          {getFormatedDate({ date: getDateFromUnix(date), locale: ELocale.ru, withCustomFormat: true })}
+          {FormatedDate.getFormatedDate(date, ELocale.ru, true, { day: 'numeric', month: '2-digit', year: 'numeric' })}
         </span>
       }
     </Link>
